@@ -63,14 +63,15 @@ All options can be set in the config file or environment variables, with environ
 
 ### Prometheus
 
-This exporter creates 4 metrics:
+This exporter creates 5 metrics:
 
 - `plausible_visitors` - How many visitors were on your site on the current day
 - `plausible_visit_duration` - How long an average visit to your site was (in seconds)
 - `plausible_pageviews` - How many page views your site had today
 - `plausible_bounce_rate` - How many visitors left your site (in percent, 0-100)
+- `plausible_health_status` - Health status of Plausible API components (1 for healthy, 0 for unhealthy)
 
-In case you've configured multiple sites to be scraped, you can differentiate between them with the `site_id` label.
+In case you've configured multiple sites to be scraped, you can differentiate between them with the `site_id` label. The health metric uses a `component` label.
 
 ### Grafana
 
