@@ -27,6 +27,7 @@ func main() {
 	for _, siteID := range siteIDs {
 		plausibleClients[siteID] = &plausible.Client{HostAPIBase: plausibleHost, SiteID: siteID, Token: token}
 	}
+	plausibleApp := &plausible.Client{HostAPIBase: plausibleHost}
 
 	metrics := prometheus.NewServer(siteIDs)
 
@@ -40,6 +41,13 @@ func main() {
 			metrics.UpdateDataForSite(siteID, data)
 			log.Printf("Data for site %s was refreshed from plausible", siteID)
 		}
+
+		status, err := plausibleApp.GetHealthStatus()
+		if err != nil {
+			log.Printf("Refreshing health status failed: %v", err)
+			return
+		}
+		metrics.UpdateHealthStatusForSite(status)
 	}
 
 	go func() {
