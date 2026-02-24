@@ -36,10 +36,40 @@ func (clt *Client) GetTimeseriesData() (*TimeseriesData, error) {
 		return nil, fmt.Errorf("plausible: unexpected HTTP status code %d received", response.StatusCode)
 	}
 
+	defer response.Body.Close()
 	var tsData tsDTO
 	err = json.NewDecoder(response.Body).Decode(&tsData)
 	if err != nil {
 		return nil, fmt.Errorf("plausible: failed to decode response data: %w", err)
 	}
 	return tsData.ToTimeseriesData(), nil
+}
+
+// GetHealth queries plausible's `/api/health` endpoint and returns a map of component names to their health status (true for healthy, false for unhealthy).
+// Known components are postgres, clickhouse, sites_cache
+func (clt *Client) GetHealth() (map[string]bool, error) {
+	url := clt.HostAPIBase.JoinPath("/api/health")
+	req, err := http.NewRequest(http.MethodGet, url.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+	response, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return nil, fmt.Errorf("plausible: request error: %w", err)
+	}
+	if response.StatusCode < 200 || response.StatusCode >= 400 {
+		return nil, fmt.Errorf("plausible: unexpected HTTP status code %d received", response.StatusCode)
+	}
+
+	defer response.Body.Close()
+	var healthStatus map[string]string
+	err = json.NewDecoder(response.Body).Decode(&healthStatus)
+	if err != nil {
+		return nil, fmt.Errorf("plausible: failed to decode response data: %w", err)
+	}
+	var result = make(map[string]bool)
+	for key, value := range healthStatus {
+		result[key] = value == "ok"
+	}
+	return result, nil
 }
