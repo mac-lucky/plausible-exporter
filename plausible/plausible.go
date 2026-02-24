@@ -45,7 +45,9 @@ func (clt *Client) GetTimeseriesData() (*TimeseriesData, error) {
 	return tsData.ToTimeseriesData(), nil
 }
 
-func (clt *Client) GetHealthStatus() (*map[string]bool, error) {
+// GetHealth queries plausible's `/api/health` endpoint and returns a map of component names to their health status (true for healthy, false for unhealthy).
+// Known components are postgres, clickhouse, sites_cache
+func (clt *Client) GetHealth() (map[string]bool, error) {
 	url := clt.HostAPIBase.JoinPath("/api/health")
 	req, err := http.NewRequest(http.MethodGet, url.String(), nil)
 	if err != nil {
@@ -69,5 +71,5 @@ func (clt *Client) GetHealthStatus() (*map[string]bool, error) {
 	for key, value := range healthStatus {
 		result[key] = value == "ok"
 	}
-	return &result, nil
+	return result, nil
 }

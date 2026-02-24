@@ -69,7 +69,7 @@ This exporter creates 5 metrics:
 - `plausible_visit_duration` - How long an average visit to your site was (in seconds)
 - `plausible_pageviews` - How many page views your site had today
 - `plausible_bounce_rate` - How many visitors left your site (in percent, 0-100)
-- `plausible_health_status` - Health status of Plausible API components (1 for healthy, 0 for unhealthy)
+- `plausible_health` - Health status of Plausible API components (1 for healthy, 0 for unhealthy)
 
 In case you've configured multiple sites to be scraped, you can differentiate between them with the `site_id` label. The health metric uses a `component` label.
 

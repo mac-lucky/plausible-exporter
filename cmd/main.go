@@ -42,7 +42,7 @@ func main() {
 			log.Printf("Data for site %s was refreshed from plausible", siteID)
 		}
 
-		status, err := plausibleApp.GetHealthStatus()
+		status, err := plausibleApp.GetHealth()
 		if err != nil {
 			log.Printf("Refreshing health status failed: %v", err)
 			return

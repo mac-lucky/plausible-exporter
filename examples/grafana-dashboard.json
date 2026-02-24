@@ -549,7 +549,7 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "plausible_health_status",
+          "expr": "plausible_health",
           "format": "time_series",
           "legendFormat": "{{component}}",
           "range": true,
@@ -562,11 +562,7 @@
   ],
   "schemaVersion": 37,
   "style": "dark",
-  "tags": [
-    "plausible",
-    "analytics",
-    "website"
-  ],
+  "tags": ["plausible", "analytics", "website"],
   "templating": {
     "list": [
       {

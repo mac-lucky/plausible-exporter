@@ -41,8 +41,8 @@ func NewServer(siteIDs []string) *MetricsServer {
 
 	healthStatus := promauto.NewGaugeVec(prometheus.GaugeOpts{
 		Namespace: "plausible",
-		Name:      "health_status",
-		Help:      "Health status of the Plausible API (1 for healthy, 0 for unhealthy)",
+		Name:      "health",
+		Help:      "Health of the Plausible API (1 for healthy, 0 for unhealthy)",
 	}, []string{"component"})
 
 	return &MetricsServer{
@@ -61,8 +61,8 @@ func (srv *MetricsServer) UpdateDataForSite(siteID string, data *plausible.Times
 	srv.visitDuration.WithLabelValues(siteID).Set(float64(data.VisitDuration))
 }
 
-func (srv *MetricsServer) UpdateHealthStatusForSite(status *map[string]bool) {
-	for key, value := range *status {
+func (srv *MetricsServer) UpdateHealthStatusForSite(status map[string]bool) {
+	for key, value := range status {
 		if value {
 			srv.healthStatus.WithLabelValues(key).Set(1)
 		} else {
