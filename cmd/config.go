@@ -62,7 +62,9 @@ func readConfig() error {
 	if token == "" {
 		return fmt.Errorf("config: no plausible token provided")
 	}
-	viper.UnmarshalKey("plausible_site_ids", &siteIDs, viper.DecodeHook(mapstructure.StringToSliceHookFunc(",")))
+	if err := viper.UnmarshalKey("plausible_site_ids", &siteIDs, viper.DecodeHook(mapstructure.StringToSliceHookFunc(","))); err != nil {
+		return fmt.Errorf("config: failed to parse plausible_site_ids: %w", err)
+	}
 	if len(siteIDs) == 0 {
 		return fmt.Errorf("config: no plausible site IDs provided")
 	}

@@ -4,6 +4,7 @@ import (
 	"context"
 	"log"
 	"net/http"
+	"time"
 
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
@@ -31,8 +32,9 @@ func (srv *Server) ListenAndServe(listenAddress string) error {
 	}
 
 	srv.s = http.Server{
-		Addr:    listenAddress,
-		Handler: mux,
+		Addr:              listenAddress,
+		Handler:           mux,
+		ReadHeaderTimeout: 5 * time.Second,
 	}
 	log.Printf("Starting server, listening on %s", listenAddress)
 	return srv.s.ListenAndServe()
