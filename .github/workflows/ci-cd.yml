@@ -36,6 +36,7 @@ jobs:
       app_name: "plausible-exporter"
       dockerhub_image: "maclucky/plausible-exporter"
       ghcr_image: "ghcr.io/mac-lucky/plausible-exporter"
+      main_branch: "main"
 
       dockerfile_path: "./Dockerfile"
       build_context: "."
