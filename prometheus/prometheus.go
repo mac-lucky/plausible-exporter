@@ -3,7 +3,7 @@ package prometheus
 import (
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promauto"
-	"github.com/riesinger/plausible-exporter/plausible"
+	"github.com/mac-lucky/plausible-exporter/plausible"
 )
 
 type MetricsServer struct {
@@ -12,6 +12,10 @@ type MetricsServer struct {
 	bounceRate    *prometheus.GaugeVec
 	visitDuration *prometheus.GaugeVec
 	healthStatus  *prometheus.GaugeVec
+	goalVisitors  *prometheus.GaugeVec
+	goalEvents    *prometheus.GaugeVec
+	propVisitors  *prometheus.GaugeVec
+	propEvents    *prometheus.GaugeVec
 }
 
 func NewServer(siteIDs []string) *MetricsServer {
@@ -45,12 +49,40 @@ func NewServer(siteIDs []string) *MetricsServer {
 		Help:      "Health of the Plausible API (1 for healthy, 0 for unhealthy)",
 	}, []string{"component"})
 
+	goalVisitors := promauto.NewGaugeVec(prometheus.GaugeOpts{
+		Namespace: "plausible",
+		Name:      "goal_visitors",
+		Help:      "Unique visitors who triggered a conversion goal",
+	}, []string{"site_id", "goal"})
+
+	goalEvents := promauto.NewGaugeVec(prometheus.GaugeOpts{
+		Namespace: "plausible",
+		Name:      "goal_events",
+		Help:      "Total conversion events for a goal",
+	}, []string{"site_id", "goal"})
+
+	propVisitors := promauto.NewGaugeVec(prometheus.GaugeOpts{
+		Namespace: "plausible",
+		Name:      "prop_visitors",
+		Help:      "Unique visitors broken down by custom property value",
+	}, []string{"site_id", "key", "value"})
+
+	propEvents := promauto.NewGaugeVec(prometheus.GaugeOpts{
+		Namespace: "plausible",
+		Name:      "prop_events",
+		Help:      "Events broken down by custom property value",
+	}, []string{"site_id", "key", "value"})
+
 	return &MetricsServer{
 		pageviews:     pageviews,
 		visitors:      visitors,
 		bounceRate:    bounceRate,
 		visitDuration: visitDuration,
 		healthStatus:  healthStatus,
+		goalVisitors:  goalVisitors,
+		goalEvents:    goalEvents,
+		propVisitors:  propVisitors,
+		propEvents:    propEvents,
 	}
 }
 
@@ -68,5 +100,30 @@ func (srv *MetricsServer) UpdateHealthStatusForSite(status map[string]bool) {
 		} else {
 			srv.healthStatus.WithLabelValues(key).Set(0)
 		}
+	}
+}
+
+// UpdateGoalsForSite replaces all goal_* series for a site. The DeletePartialMatch
+// keeps disappearing goals from sticking around as stale gauges.
+func (srv *MetricsServer) UpdateGoalsForSite(siteID string, items []plausible.BreakdownItem) {
+	match := prometheus.Labels{"site_id": siteID}
+	srv.goalVisitors.DeletePartialMatch(match)
+	srv.goalEvents.DeletePartialMatch(match)
+	for _, item := range items {
+		srv.goalVisitors.WithLabelValues(siteID, item.Name).Set(float64(item.Visitors))
+		srv.goalEvents.WithLabelValues(siteID, item.Name).Set(float64(item.Events))
+	}
+}
+
+// UpdatePropForSite replaces all prop_* series for (site, key). Same staleness
+// reasoning as UpdateGoalsForSite — when a prop value drops out of the top-N
+// the gauge for it must go too.
+func (srv *MetricsServer) UpdatePropForSite(siteID, key string, items []plausible.BreakdownItem) {
+	match := prometheus.Labels{"site_id": siteID, "key": key}
+	srv.propVisitors.DeletePartialMatch(match)
+	srv.propEvents.DeletePartialMatch(match)
+	for _, item := range items {
+		srv.propVisitors.WithLabelValues(siteID, key, item.Name).Set(float64(item.Visitors))
+		srv.propEvents.WithLabelValues(siteID, key, item.Name).Set(float64(item.Events))
 	}
 }

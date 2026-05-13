@@ -9,9 +9,9 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/riesinger/plausible-exporter/plausible"
-	"github.com/riesinger/plausible-exporter/prometheus"
-	"github.com/riesinger/plausible-exporter/server"
+	"github.com/mac-lucky/plausible-exporter/plausible"
+	"github.com/mac-lucky/plausible-exporter/prometheus"
+	"github.com/mac-lucky/plausible-exporter/server"
 )
 
 func main() {
@@ -33,12 +33,32 @@ func main() {
 
 	updatePlausibleData := func() {
 		for _, siteID := range siteIDs {
-			data, err := plausibleClients[siteID].GetTimeseriesData()
+			clt := plausibleClients[siteID]
+			data, err := clt.GetTimeseriesData()
 			if err != nil {
 				log.Printf("Refreshing data for site %s failed: %v", siteID, err)
-				return
+				continue
 			}
 			metrics.UpdateDataForSite(siteID, data)
+
+			if goalsEnabled {
+				if items, err := clt.GetBreakdown("event:goal", "goal", period, goalsLimit); err != nil {
+					log.Printf("Refreshing goals for site %s failed: %v", siteID, err)
+				} else {
+					metrics.UpdateGoalsForSite(siteID, items)
+				}
+			}
+
+			for _, prop := range propConfigs {
+				property := "event:props:" + prop.Key
+				items, err := clt.GetBreakdown(property, prop.Key, period, prop.Limit)
+				if err != nil {
+					log.Printf("Refreshing prop %q for site %s failed: %v", prop.Key, siteID, err)
+					continue
+				}
+				metrics.UpdatePropForSite(siteID, prop.Key, items)
+			}
+
 			log.Printf("Data for site %s was refreshed from plausible", siteID)
 		}
 

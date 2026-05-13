@@ -58,18 +58,26 @@ All options can be set in the config file or environment variables, with environ
 | `plausible_token`    | ✅       | A valid API token for your plausible server                            | -              |
 | `listen_address`     | ❌       | Which host and port to listen to                                       | `0.0.0.0:8080` |
 | `bearer_auth_token`  | ❌       | Bearer token to authorize metrics route through `Authorization` header | -              |
+| `period`             | ❌       | Stats API `period` for aggregate + breakdown queries                   | `day`          |
+| `goals_enabled`      | ❌       | Emit per-goal breakdown metrics (`event:goal`)                         | `false`        |
+| `goals_limit`        | ❌       | Max rows fetched from the goals breakdown (API max 1000)               | `100`          |
+| `prop_keys`          | ❌       | Comma-separated custom-prop keys to break down. Format `key[:limit]`. Per-entry limit caps cardinality on unbounded keys like `path` | - |
 
 > **Note:** Config options that are lists must be comma-separated when passed as an environment variable, e.g. `PLAUSIBLE_SITE_IDS=riesinger.dev,nononsense.cooking`
 
 ### Prometheus
 
-This exporter creates 5 metrics:
+This exporter creates the following metrics:
 
 - `plausible_visitors` - How many visitors were on your site on the current day
 - `plausible_visit_duration` - How long an average visit to your site was (in seconds)
 - `plausible_pageviews` - How many page views your site had today
 - `plausible_bounce_rate` - How many visitors left your site (in percent, 0-100)
 - `plausible_health` - Health status of Plausible API components (1 for healthy, 0 for unhealthy)
+- `plausible_goal_visitors{site_id, goal}` - Unique visitors who triggered each goal (emitted when `goals_enabled=true`)
+- `plausible_goal_events{site_id, goal}` - Total events per goal
+- `plausible_prop_visitors{site_id, key, value}` - Visitors broken down by configured custom-prop value
+- `plausible_prop_events{site_id, key, value}` - Events broken down by configured custom-prop value
 
 In case you've configured multiple sites to be scraped, you can differentiate between them with the `site_id` label. The health metric uses a `component` label.
 

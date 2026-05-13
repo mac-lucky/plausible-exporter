@@ -53,3 +53,12 @@ func (d tsDTO) ToTimeseriesData() *TimeseriesData {
 		Visitors:      d.Results.Visitors.Value,
 	}
 }
+
+// BreakdownItem is one row of /api/v1/stats/breakdown. The property column
+// (goal name or custom-prop value) is keyed by Name; numeric metrics are kept
+// generic so the same struct serves both event:goal and event:props:KEY.
+type BreakdownItem struct {
+	Name     string
+	Visitors uint
+	Events   uint
+}

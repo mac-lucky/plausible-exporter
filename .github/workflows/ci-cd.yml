@@ -1,0 +1,55 @@
+---
+name: CI/CD Pipeline - Plausible Exporter
+
+on:
+  push:
+    branches: ["main"]
+    paths-ignore:
+      - "*.md"
+      - "LICENSE*"
+      - ".gitignore"
+  pull_request:
+    branches: ["main"]
+    paths-ignore:
+      - "*.md"
+      - "LICENSE*"
+      - ".gitignore"
+  pull_request_target:
+    branches: ["main"]
+    types: [opened, synchronize, reopened]
+    paths-ignore:
+      - "*.md"
+      - "LICENSE*"
+      - ".gitignore"
+  release:
+    types: [published]
+  workflow_dispatch:
+
+jobs:
+  ci-cd:
+    uses: mac-lucky/actions-shared-workflows/.github/workflows/go-cicd-reusable.yml@master
+    permissions:
+      contents: read
+      packages: write
+      security-events: write
+    with:
+      app_name: "plausible-exporter"
+      dockerhub_image: "maclucky/plausible-exporter"
+      ghcr_image: "ghcr.io/mac-lucky/plausible-exporter"
+
+      dockerfile_path: "./Dockerfile"
+      build_context: "."
+
+      enable_go_tests: true
+
+      enable_container_tests: false
+      enable_kubernetes_tests: false
+
+      enable_security_scan: true
+      enable_sbom: true
+
+      enable_auto_version: true
+      push_on_main: true
+    secrets:
+      DOCKER_HUB_USERNAME: ${{ secrets.DOCKER_HUB_USERNAME }}
+      DOCKER_HUB_PASSWORD: ${{ secrets.DOCKER_HUB_PASSWORD }}

@@ -1,4 +1,4 @@
-FROM golang:1.26-alpine as builder
+FROM golang:1.26-alpine AS builder
 
 WORKDIR /go/src/app
 
@@ -11,7 +11,7 @@ COPY . .
 RUN CGO_ENABLED=0 go install -ldflags '-s -w -extldflags "-static"' -tags timetzdata ./cmd
 RUN ls -l /go/bin
 
-FROM scratch as runner
+FROM scratch AS runner
 
 # Copy the built binary
 COPY --from=builder /go/bin/cmd /plausible-exporter

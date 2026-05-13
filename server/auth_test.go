@@ -5,7 +5,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/riesinger/plausible-exporter/server"
+	"github.com/mac-lucky/plausible-exporter/server"
 )
 
 func TestValidToken(t *testing.T) {

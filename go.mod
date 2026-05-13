@@ -1,4 +1,4 @@
-module github.com/riesinger/plausible-exporter
+module github.com/mac-lucky/plausible-exporter
 
 go 1.26
 
