@@ -1,4 +1,4 @@
-FROM golang:1.26-alpine AS builder
+FROM golang:1.26-alpine@sha256:0178a641fbb4858c5f1b48e34bdaabe0350a330a1b1149aabd498d0699ff5fb2 AS builder
 
 WORKDIR /go/src/app
 
@@ -19,6 +19,6 @@ LABEL org.opencontainers.image.description="Prometheus exporter for Plausible An
 # Copy the built binary
 COPY --from=builder /go/bin/cmd /plausible-exporter
 # Copy the CA root certificats from the latest alpine image
-COPY --from=alpine:latest /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
+COPY --from=alpine:latest@sha256:28bd5fe8b56d1bd048e5babf5b10710ebe0bae67db86916198a6eec434943f8b /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 
 ENTRYPOINT [ "/plausible-exporter" ]
