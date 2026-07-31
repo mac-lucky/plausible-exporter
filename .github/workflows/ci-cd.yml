@@ -39,7 +39,11 @@ jobs:
       enable_security_scan: true
       enable_sbom: true
 
-      push_to_dockerhub: true
+      # DOCKER_HUB_USERNAME/DOCKER_HUB_PASSWORD are not set on this repo yet,
+      # so pushing here fails the whole per-arch build job (login is a
+      # blocking step ahead of the GHCR push). Flip to true once the secrets
+      # exist.
+      push_to_dockerhub: false
     secrets:
       DOCKER_HUB_USERNAME: ${{ secrets.DOCKER_HUB_USERNAME }}
       DOCKER_HUB_PASSWORD: ${{ secrets.DOCKER_HUB_PASSWORD }}
