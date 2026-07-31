@@ -13,6 +13,9 @@ RUN ls -l /go/bin
 
 FROM scratch AS runner
 
+LABEL org.opencontainers.image.source="https://github.com/mac-lucky/plausible-exporter"
+LABEL org.opencontainers.image.description="Prometheus exporter for Plausible Analytics stats"
+
 # Copy the built binary
 COPY --from=builder /go/bin/cmd /plausible-exporter
 # Copy the CA root certificats from the latest alpine image
