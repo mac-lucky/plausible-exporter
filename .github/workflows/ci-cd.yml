@@ -21,7 +21,7 @@ permissions:
 
 jobs:
   ci-cd:
-    uses: mac-lucky/actions-shared-workflows/.github/workflows/go-cicd-reusable.yml@fix/go-toolchain-latest-patch
+    uses: mac-lucky/actions-shared-workflows/.github/workflows/go-cicd-reusable.yml@master
     with:
       app_name: "plausible-exporter"
       dockerhub_image: "maclucky/plausible-exporter"
