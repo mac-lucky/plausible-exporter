@@ -9,6 +9,10 @@ on:
       - "LICENSE*"
       - ".gitignore"
 
+# The tag is pushed with TAG_PUSH_TOKEN; the job token only reads.
+permissions:
+  contents: read
+
 jobs:
   tag:
     uses: mac-lucky/actions-shared-workflows/.github/workflows/auto-tag-reusable.yml@master
