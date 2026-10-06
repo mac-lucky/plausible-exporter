@@ -9,7 +9,7 @@ on:
       - "LICENSE*"
       - ".gitignore"
 
-# The tag is pushed with TAG_PUSH_TOKEN; the job token only reads.
+# The tag is pushed with a mac-lucky-ci GitHub App token; the job token only reads.
 permissions:
   contents: read
 
@@ -19,4 +19,5 @@ jobs:
     with:
       mode: patch
     secrets:
-      TAG_PUSH_TOKEN: ${{ secrets.TAG_PUSH_TOKEN }}
+      CI_APP_CLIENT_ID: ${{ secrets.CI_APP_CLIENT_ID }}
+      CI_APP_PRIVATE_KEY: ${{ secrets.CI_APP_PRIVATE_KEY }}
