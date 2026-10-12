@@ -1,6 +1,8 @@
 ---
 name: Auto Tag
 
+run-name: ${{ inputs.images && format('rebuild {0}', inputs.images) || '' }}
+
 on:
   push:
     branches: ["main"]
@@ -8,6 +10,17 @@ on:
       - "*.md"
       - "LICENSE*"
       - ".gitignore"
+  # The nightly GHCR scan in mac-lucky/forgejo-fleet-ops dispatches the next
+  # patch tag when a rebuild alone would clear the image's findings (base
+  # packages, a floating Go patch), and finds its own runs again by the run
+  # name.
+  workflow_dispatch:
+    inputs:
+      images:
+        description: 'GHCR packages to rebuild, space-separated (set by the nightly scan)'
+        required: false
+        type: string
+        default: ''
 
 # The tag is pushed with a mac-lucky-ci GitHub App token; the job token only reads.
 permissions:
