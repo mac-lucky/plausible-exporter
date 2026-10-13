@@ -6,10 +6,14 @@ run-name: ${{ inputs.images && format('rebuild {0}', inputs.images) || '' }}
 on:
   push:
     branches: ["main"]
-    paths-ignore:
-      - "*.md"
-      - "LICENSE*"
-      - ".gitignore"
+    # Only what reaches the image: the Dockerfile copies the whole tree, but
+    # the binary is built from the module's non-test Go files.
+    paths:
+      - "Dockerfile"
+      - "go.mod"
+      - "go.sum"
+      - "**.go"
+      - "!**_test.go"
   # The nightly GHCR scan in mac-lucky/forgejo-fleet-ops dispatches the next
   # patch tag when a rebuild alone would clear the image's findings (base
   # packages, a floating Go patch), and finds its own runs again by the run
@@ -25,6 +29,11 @@ on:
 # The tag is pushed with a mac-lucky-ci GitHub App token; the job token only reads.
 permissions:
   contents: read
+
+# A dispatch and a push racing would compute the same tag; queue them instead.
+concurrency:
+  group: auto-tag
+  cancel-in-progress: false
 
 jobs:
   tag:
