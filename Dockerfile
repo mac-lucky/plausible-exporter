@@ -19,6 +19,6 @@ LABEL org.opencontainers.image.description="Prometheus exporter for Plausible An
 # Copy the built binary
 COPY --from=builder /go/bin/cmd /plausible-exporter
 # Copy the CA root certificats from the latest alpine image
-COPY --from=alpine:latest@sha256:71e9b7bae160ba167fa17414401b94cbcdaf3c32feeab9298bd794a2a0614c35 /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
+COPY --from=alpine:latest@sha256:be2656061b536c1883c4034790e21d0a09c5aaaf51968b89368a3c0371ea2c9a /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 
 ENTRYPOINT [ "/plausible-exporter" ]
